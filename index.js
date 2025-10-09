@@ -1,36 +1,37 @@
-import * as Shaders from '/src/globalGlsl.js';
-import * as Trans from '/src/matrix.js';
-import { PI, TAU, Shapes, Util } from '/src/util.js';
+import { CiosaiGL, Trans, Shapes } from "./lib/ciosaigl/index.js";
+import { Metro } from "./src/metro.js";
 
 let canvas = document.getElementById('the-canvas');
 let startButton = document.getElementById('start');
 
 let gl = canvas.getContext('webgl', { premultipliedAlpha: false });
 
-let shapeMaker = new Shapes();
-let utilObj = new Util(gl);
-
-let program = utilObj.createProgram(Shaders.vbasic, Shaders.fdebug);
-
-utilObj.showAttributes(program);
-utilObj.showUniforms(program);
+let ciosaigl = new CiosaiGL(gl);
+let metro = new Metro(ciosaigl);
 
 function start() {
   canvas.requestFullscreen();
-  setInterval(() => {
-    let time = Date.now()/1000;
-    let vertices = time%1<0.5?shapeMaker.circle({innerRadius: 0.5}):shapeMaker.rect();
-    utilObj.pushVerts(program, vertices.flat());
-    let tr = Trans.multAll([
-        Trans.scale(9/16,1,1),
-        Trans.xlate(Math.cos(time*2.2)*.5, Math.sin(time*1.9)*.5, 0),
-        Trans.scale(0.2,0.2,0.2),
-        Trans.rotZ(time),
-      ]);
-    utilObj.setUniform(program, 'mat4', 'xform', tr.flat());
-    //utilObj.setUniform(program, 'vec4', 'color', [Math.sin(time)*0.5+0.5,0,0,1]);
-    utilObj.flush(program, vertices.length);
-  }, 10);
+
+  const RED = [1,0,0,1];
+  const BLUE = [0,0,1,1];
+
+  let a = metro.createStation('Zhongshan', RED);
+  let b = metro.createStation('Taipei Main', RED);
+  metro.createConnection(a, b, RED);
+  a = metro.createStation('NTU Hospital', RED);
+  metro.createConnection(b, a, RED);
+
+  a = metro.createStation('Shandao Temple', BLUE);
+  metro.createConnection(b, a, BLUE);
+  a = metro.createStation('Ximen', BLUE);
+  metro.createConnection(a, b, BLUE);
+
+  ciosaigl.run((time)=>{
+    ciosaigl.background([0,0.3,0.3,1]);
+
+    metro.physics({attract: .002, repulse: 0.001, slippy: 0.8});
+    metro.render();
+  });
 }
 
 //startButton.onclick = (e)=>{start();};
