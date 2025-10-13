@@ -18,7 +18,7 @@ class Station {
 export class Metro {
   constructor (ciosaigl) {
     this.ciosaigl = ciosaigl;
-    this.shapeMaker = new Shapes(32);
+    this.shapeMaker = new Shapes(16);
     this.stations = [];
     this.connections = [];
     this.shapes = {};
@@ -59,9 +59,6 @@ export class Metro {
     for (let node of this.stations) {
       for (let other of this.stations) {
 	if (node===other) { continue; }
-	if (this.connections.every(connection=>
-	  !connection.nodes.includes(node) && !connection.nodes.includes(other)
-	)) { continue; }
 	let delx = other.x - node.x;
 	let dely = other.y - node.y;
 	let dist = Math.sqrt(delx*delx+dely*dely);
@@ -69,6 +66,9 @@ export class Metro {
 	let nory = dely/dist;
 	node.velx += -norx * (repulse/dist);
 	node.vely += -nory * (repulse/dist);
+	if (this.connections.every(connection=>
+	  !(connection.nodes.includes(node) && connection.nodes.includes(other))
+	)) { continue; }
 	node.velx += norx * Math.sqrt(dist)*attract;
 	node.vely += nory * Math.sqrt(dist)*attract;
       }
@@ -79,9 +79,9 @@ export class Metro {
     }
   }
 
-  render () {
+  render (globTrans=Trans.identity, globInvert=Trans.identity) {
     for (let c of this.connections) {
-      let shape = this.shapeMaker.capsule({a: c.nodes[0].toVec4(), b: c.nodes[1].toVec4(), radius: 0.02});
+      let shape = this.shapeMaker.capsule({a: c.nodes[0].toVec4(), b: c.nodes[1].toVec4(), radius: 0.005});
       if (!this.shapes.hasOwnProperty('capsule')) {
 	this.shapes['capsule'] = this.ciosaigl.initShape(shape);
       }
@@ -91,6 +91,7 @@ export class Metro {
 
       this.ciosaigl.xform(Trans.multAll([
         Trans.scale(9/16,1,1),
+	globTrans,
         Trans.scale(1, 1, 1),
       ]));
       this.ciosaigl.color(c.color);
@@ -100,12 +101,14 @@ export class Metro {
     if (!this.shapes.hasOwnProperty('circle')) {
       this.shapes['circle'] = this.ciosaigl.initShape(this.shapeMaker.circle());
     }
-    let sz = 0.05;
+    let sz = 0.01;
     for (let s of this.stations) {
       if (s.colors.length>1) {
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
+	  globTrans,
 	  Trans.xlate(s.x, s.y, 0),
+	  globInvert,
 	  Trans.scale(sz*1.5, sz*1.5, sz*1.5),
 	]));
 	this.ciosaigl.color([0, 0, 0, 1]);
@@ -113,7 +116,9 @@ export class Metro {
 
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
+	  globTrans,
 	  Trans.xlate(s.x, s.y, 0),
+	  globInvert,
 	  Trans.scale(sz, sz, sz),
 	]));
 	this.ciosaigl.color([1, 1, 1, 1]);
@@ -122,7 +127,9 @@ export class Metro {
       else {
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
+	  globTrans,
 	  Trans.xlate(s.x, s.y, 0),
+	  globInvert,
 	  Trans.scale(sz, sz, sz),
 	]));
 	this.ciosaigl.color([0, 0, 0, 1]);
