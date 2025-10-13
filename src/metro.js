@@ -21,6 +21,7 @@ export class Metro {
     this.shapeMaker = new Shapes(16);
     this.stations = [];
     this.connections = [];
+    this.trains = [];
     this.shapes = {};
   }
 
@@ -38,14 +39,52 @@ export class Metro {
     }
   }
 
+  createTrain (color, startingStation) {
+    let train = {line: color, fromSta: startingStation, toSta: startingStation, forward: true, perc: 0.0};
+    this.trains.push(train);
+    this.setTrainRoute(train);
+  }
+
+  setTrainRoute (train) {
+    let nextSta = this.connections.find(connection=>
+      connection.color===train.line &&
+      connection.nodes[train.forward?0:1]===train.fromSta
+    );
+    if (nextSta) {
+      train.toSta = nextSta.nodes[train.forward?1:0];
+      return true;
+    }
+    return false;
+  }
+
+  runTrain (speed) {
+    for (let train of this.trains) {
+      train.perc += speed;
+      if (train.perc<0) { train.perc = 0; }
+      if (train.perc>1) {
+	train.perc -= Math.floor(train.perc);
+	train.fromSta = train.toSta;
+	let hasNext = this.setTrainRoute(train);
+	if (!hasNext) {
+	  train.forward = !train.forward;
+	  this.setTrainRoute(train);
+	}
+      }
+    }
+  }
+
   entireLine (color, list) {
+    let stationList = [];
     let station = this.createStation(list[0], color);
+    stationList.push(station);
     for (let i=1; i<list.length; i++) {
       let exists = this.stations.find(s=>s.name===list[i]);
       let next = exists?exists:this.createStation(list[i], color);
       this.createConnection(station, next, color, !!exists);
       station = next;
+      stationList.push(station);
     }
+    return stationList;
   }
 
   physics (param={}) {
@@ -136,6 +175,18 @@ export class Metro {
 	this.ciosaigl.drawShape(this.shapes['circle']);
       }
     }
-
+    for (let t of this.trains) {
+      let x = t.fromSta.x*(1.0-t.perc) + t.toSta.x*t.perc;
+      let y = t.fromSta.y*(1.0-t.perc) + t.toSta.y*t.perc;
+      this.ciosaigl.xform(Trans.multAll([
+	Trans.scale(9/16,1,1),
+	globTrans,
+	Trans.xlate(x, y, 0),
+	globInvert,
+	Trans.scale(sz*2, sz*2, sz*2),
+      ]));
+      this.ciosaigl.color(t.line);
+      this.ciosaigl.drawShape(this.shapes['circle']);
+    }
   }
 }
