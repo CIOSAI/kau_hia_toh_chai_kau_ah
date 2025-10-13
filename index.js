@@ -12,26 +12,23 @@ let metro = new Metro(ciosaigl);
 function start() {
   canvas.requestFullscreen();
 
-  const RED = [1,0,0,1];
-  const BLUE = [0,0,1,1];
+  const RED = [0.9,0.1,0.2,1];
+  const BLUE = [0.1,0.5,0.9,1];
+  const GREEN = [0.1,0.8,0.3,1];
+  const YELLOW = [0.8,0.7,0.1,1];
 
-  let a = metro.createStation('Zhongshan', RED);
-  let b = metro.createStation('Taipei Main', RED);
-  metro.createConnection(a, b, RED);
-  a = metro.createStation('NTU Hospital', RED);
-  metro.createConnection(b, a, RED);
+  metro.entireLine(RED, ['Yuanshan', 'Minquan W. Rd.', 'Shuanglian', 'Zhongshan', 'Taipei Main', 'NTU Hospital', 'Chiang Kai-shek Memorial Hall', 'Dongmen', 'Daan Park']);
+  metro.entireLine(YELLOW, ['Daqiaotou', 'Minquan W. Rd.', 'Zhongshan Elementary School', 'Xingtian Temple', 'Songjiang Nanjing', 'Zhongxiao Xinsheng', 'Dongmen', 'Guting', 'Dingxi']);
+  metro.entireLine(GREEN, ['Nanjing Fuxing', 'Songjiang Nanjing', 'Zhongshan', 'Beimen', 'Ximen', 'Xiaonanmen', 'Chiang Kai-shek Memorial Hall', 'Guting', 'Taipower Building']);
+  metro.entireLine(BLUE, ['Longshan Temple', 'Ximen', 'Taipei Main', 'Shandao Temple', 'Zhongxiao Xinsheng', 'Zhongxiao Fuxing']);
 
-  a = metro.createStation('Shandao Temple', BLUE);
-  metro.createConnection(b, a, BLUE);
-  a = metro.createStation('Ximen', BLUE);
-  metro.createConnection(a, b, BLUE);
-
+  ciosaigl.noop();
   ciosaigl.run((time)=>{
-    ciosaigl.background([0,0.3,0.3,1]);
+    ciosaigl.background([0.95,0.95,0.95,1]);
 
-    metro.physics({attract: .002, repulse: 0.001, slippy: 0.8});
+    metro.physics({attract: .0005, repulse: 0.0004, slippy: 0.8});
     metro.render();
-  });
+  }, {oneFrame: false});
 }
 
 //startButton.onclick = (e)=>{start();};
