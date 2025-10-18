@@ -25,8 +25,16 @@ export class Metro {
     this.trains = [];
     this.shapes = {};
     
-    this.songBf = this.ciosaigl.initFb(this.audio.sampleRate*0.5, 1);
-    this.songShader = this.ciosaigl.initShader(Shaders.fbeep);
+    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate*2/4, height: 1});
+    this.songShader = this.ciosaigl.initShader(Shaders.fbeep, `
+    void main() {
+      int i = gl_VertexID;
+      vec2 p = i==0?vec2(-1,-1):i==1?vec2(2,-1):vec2(-1,2);
+      gl_Position = vec4(p,0,1);
+    }
+      `);
+    console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.SHADING_LANGUAGE_VERSION));
+    console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.VERSION));
   }
 
   beep () {
@@ -43,15 +51,12 @@ export class Metro {
     let pitch = Math.floor(Math.random()*4)*80.0+440.0;
     
       this.ciosaigl.useFb(this.songBf);
-      if (!this.shapes.hasOwnProperty('quad')) {
-	this.shapes['quad'] = this.ciosaigl.initShape(this.shapeMaker.rect(), this.songShader);
-      }
       this.ciosaigl.setUniform(this.songShader, [
 	{type: 'float', key: 'sampleRate', value: this.audio.sampleRate},
 	{type: 'float', key: 'pitch', value: pitch},
 	{type: 'float', key: 'volume', value: 0.1},
       ]);
-      this.ciosaigl.drawShape(this.shapes['quad'], this.songShader);
+      this.ciosaigl.drawShape({loc: 0, tri: 3}, this.songShader);
       let haha = this.ciosaigl.util.fbs[this.songBf];
       haha;
       this.ciosaigl.useFb();

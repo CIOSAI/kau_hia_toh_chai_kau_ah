@@ -5,7 +5,7 @@ const AudioContext = window.AudioContext || window.webkitAudioContext;
 let canvas = document.getElementById('the-canvas');
 let startButton = document.getElementById('start');
 
-let gl = canvas.getContext('webgl', { premultipliedAlpha: false });
+let gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
 
 let audioCtx = new AudioContext();
 
