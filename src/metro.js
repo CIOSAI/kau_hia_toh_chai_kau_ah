@@ -1,4 +1,4 @@
-import { CiosaiGL, Trans, Shapes } from "/lib/ciosaigl/index.js";
+import { CiosaiGL, Trans, Shapes, Shaders } from "/lib/ciosaigl/index.js";
 
 class Station {
   constructor (x, y, name, color) {
@@ -16,13 +16,51 @@ class Station {
 }
 
 export class Metro {
-  constructor (ciosaigl) {
+  constructor (ciosaigl, audio) {
     this.ciosaigl = ciosaigl;
+    this.audio = audio;
     this.shapeMaker = new Shapes(16);
     this.stations = [];
     this.connections = [];
     this.trains = [];
     this.shapes = {};
+    
+    this.songBf = this.ciosaigl.initFb(this.audio.sampleRate*0.5, 1);
+    this.songShader = this.ciosaigl.initShader(Shaders.fbeep);
+  }
+
+  beep () {
+    let duration = 0.3;
+
+    let bf = new AudioBuffer(
+      {numberOfChannels: 2, length: this.audio.sampleRate * duration, sampleRate: this.audio.sampleRate}
+    );
+
+    let leftRef = bf.getChannelData(0);
+    let rightRef = bf.getChannelData(1);
+
+    if (this.audio.state==='running') {
+    let pitch = Math.floor(Math.random()*4)*80.0+440.0;
+    
+      this.ciosaigl.useFb(this.songBf);
+      if (!this.shapes.hasOwnProperty('quad')) {
+	this.shapes['quad'] = this.ciosaigl.initShape(this.shapeMaker.rect(), this.songShader);
+      }
+      this.ciosaigl.setUniform(this.songShader, [
+	{type: 'float', key: 'sampleRate', value: this.audio.sampleRate},
+	{type: 'float', key: 'pitch', value: pitch},
+	{type: 'float', key: 'volume', value: 0.1},
+      ]);
+      this.ciosaigl.drawShape(this.shapes['quad'], this.songShader);
+      let haha = this.ciosaigl.util.fbs[this.songBf];
+      haha;
+      this.ciosaigl.useFb();
+    }
+
+    let soundClip = new AudioBufferSourceNode(this.audio, {buffer: bf});
+
+    soundClip.connect(this.audio.destination);
+    soundClip.start();
   }
 
   createStation (name, color) {
@@ -62,6 +100,7 @@ export class Metro {
       train.perc += speed;
       if (train.perc<0) { train.perc = 0; }
       if (train.perc>1) {
+	this.beep();
 	train.perc -= Math.floor(train.perc);
 	train.fromSta = train.toSta;
 	let hasNext = this.setTrainRoute(train);
