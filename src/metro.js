@@ -25,7 +25,7 @@ export class Metro {
     this.trains = [];
     this.shapes = {};
     
-    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate/4, height: 2});
+    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate/4, height: 2, format: this.ciosaigl.gl.RGBA32F});
     this.songShader = this.ciosaigl.initShader(Shaders.fbeep, `
     void main() {
       int i = gl_VertexID;
@@ -38,7 +38,7 @@ export class Metro {
   }
 
   beep () {
-    let duration = 0.3;
+    let duration = 1.0;
 
     let bf = new AudioBuffer(
       {numberOfChannels: 2, length: this.audio.sampleRate * duration, sampleRate: this.audio.sampleRate}
@@ -56,10 +56,8 @@ export class Metro {
       this.ciosaigl.drawShape({loc: 0, tri: 3}, this.songShader);
 
       let fillBuffer = (isLeft) => {
-	let temp = new Uint8Array(4*2*this.audio.sampleRate/4);
 	this.ciosaigl.gl.readPixels(0,isLeft?0:1,this.audio.sampleRate/4,1,
-				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.UNSIGNED_BYTE,temp);
-	bf.copyToChannel(Float32Array.from(temp, x=>(x-128.0)/128.0), isLeft?0:1);
+				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,bf.getChannelData(isLeft?0:1));
       };
       fillBuffer(true); fillBuffer(false);
 
