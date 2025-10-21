@@ -25,7 +25,7 @@ export class Metro {
     this.trains = [];
     this.shapes = {};
     
-    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate*2/4, height: 1});
+    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate/4, height: 2});
     this.songShader = this.ciosaigl.initShader(Shaders.fbeep, `
     void main() {
       int i = gl_VertexID;
@@ -44,9 +44,6 @@ export class Metro {
       {numberOfChannels: 2, length: this.audio.sampleRate * duration, sampleRate: this.audio.sampleRate}
     );
 
-    let leftRef = bf.getChannelData(0);
-    let rightRef = bf.getChannelData(1);
-
     if (this.audio.state==='running') {
     let pitch = Math.floor(Math.random()*4)*80.0+440.0;
     
@@ -54,11 +51,18 @@ export class Metro {
       this.ciosaigl.setUniform(this.songShader, [
 	{type: 'float', key: 'sampleRate', value: this.audio.sampleRate},
 	{type: 'float', key: 'pitch', value: pitch},
-	{type: 'float', key: 'volume', value: 0.1},
+	{type: 'float', key: 'volume', value: 0.5},
       ]);
       this.ciosaigl.drawShape({loc: 0, tri: 3}, this.songShader);
-      let haha = this.ciosaigl.util.fbs[this.songBf];
-      haha;
+
+      let fillBuffer = (isLeft) => {
+	let temp = new Uint8Array(4*2*this.audio.sampleRate/4);
+	this.ciosaigl.gl.readPixels(0,isLeft?0:1,this.audio.sampleRate/4,1,
+				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.UNSIGNED_BYTE,temp);
+	bf.copyToChannel(Float32Array.from(temp, x=>(x-128.0)/128.0), isLeft?0:1);
+      };
+      fillBuffer(true); fillBuffer(false);
+
       this.ciosaigl.useFb();
     }
 
