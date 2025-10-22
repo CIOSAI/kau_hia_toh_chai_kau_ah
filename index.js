@@ -1,16 +1,14 @@
-import { CiosaiGL, Trans, Shapes } from "./lib/ciosaigl/index.js";
+import { CiosaiGL } from "./lib/ciosaigl/index.js";
 import { Metro } from "./src/metro.js";
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+import { Beeper } from "./src/audio.js";
 
 let canvas = document.getElementById('the-canvas');
 let startButton = document.getElementById('start');
 
 let gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
 
-let audioCtx = new AudioContext();
-
 let ciosaigl = new CiosaiGL(gl);
-let metro = new Metro(ciosaigl, audioCtx);
+let metro = new Metro(ciosaigl, new Beeper(ciosaigl));
 
 function start() {
   canvas.requestFullscreen();

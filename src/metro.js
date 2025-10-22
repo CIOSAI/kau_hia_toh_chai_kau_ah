@@ -1,4 +1,4 @@
-import { CiosaiGL, Trans, Shapes, Shaders } from "/lib/ciosaigl/index.js";
+import { Trans, Shapes } from "/lib/ciosaigl/index.js";
 
 class Station {
   constructor (x, y, name, color) {
@@ -16,58 +16,30 @@ class Station {
 }
 
 export class Metro {
-  constructor (ciosaigl, audio) {
+  constructor (ciosaigl, beeper) {
     this.ciosaigl = ciosaigl;
-    this.audio = audio;
+    this.beeper = beeper;
     this.shapeMaker = new Shapes(16);
     this.stations = [];
     this.connections = [];
     this.trains = [];
     this.shapes = {};
+    this.bell = this.beeper.initSynth('bell', `
+    vec2 song(float t) {
+      float v = sin(t*pitch*TAU) * exp(-t*11.) * volume;
+      return vec2(v); 
+    }`);
     
-    this.songBf = this.ciosaigl.initFb({width: this.audio.sampleRate/4, height: 2, format: this.ciosaigl.gl.RGBA32F});
-    this.songShader = this.ciosaigl.initShader(Shaders.fbeep, `
-    void main() {
-      int i = gl_VertexID;
-      vec2 p = i==0?vec2(-1,-1):i==1?vec2(2,-1):vec2(-1,2);
-      gl_Position = vec4(p,0,1);
-    }
-      `);
     console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.SHADING_LANGUAGE_VERSION));
     console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.VERSION));
   }
 
   beep () {
-    let duration = 1.0;
-
-    let bf = new AudioBuffer(
-      {numberOfChannels: 2, length: this.audio.sampleRate * duration, sampleRate: this.audio.sampleRate}
-    );
-
-    if (this.audio.state==='running') {
     let pitch = Math.floor(Math.random()*4)*80.0+440.0;
-    
-      this.ciosaigl.useFb(this.songBf);
-      this.ciosaigl.setUniform(this.songShader, [
-	{type: 'float', key: 'sampleRate', value: this.audio.sampleRate},
-	{type: 'float', key: 'pitch', value: pitch},
-	{type: 'float', key: 'volume', value: 0.5},
-      ]);
-      this.ciosaigl.drawShape({loc: 0, tri: 3}, this.songShader);
-
-      let fillBuffer = (isLeft) => {
-	this.ciosaigl.gl.readPixels(0,isLeft?0:1,this.audio.sampleRate/4,1,
-				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,bf.getChannelData(isLeft?0:1));
-      };
-      fillBuffer(true); fillBuffer(false);
-
-      this.ciosaigl.useFb();
-    }
-
-    let soundClip = new AudioBufferSourceNode(this.audio, {buffer: bf});
-
-    soundClip.connect(this.audio.destination);
-    soundClip.start();
+    this.beeper.play(this.bell, [
+      {type: 'float', key: 'pitch', value: pitch},
+      {type: 'float', key: 'volume', value: 0.2},
+    ]);
   }
 
   createStation (name, color) {
