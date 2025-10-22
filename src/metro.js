@@ -1,4 +1,5 @@
 import { Trans, Shapes } from "/lib/ciosaigl/index.js";
+import { Beeper } from "./audio.js";
 
 class Station {
   constructor (x, y, name, color) {
@@ -35,7 +36,9 @@ export class Metro {
   }
 
   beep () {
-    let pitch = Math.floor(Math.random()*4)*80.0+440.0;
+    if (!Object.hasOwn(this, 'uwu')) {this['uwu'] = 0;}
+    else {this['uwu']++; this['uwu']=this['uwu']>=8?this['uwu']-8:this['uwu'];}
+    let pitch = Beeper.pitch(['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6'][this['uwu']]);
     this.beeper.play(this.bell, [
       {type: 'float', key: 'pitch', value: pitch},
       {type: 'float', key: 'volume', value: 0.2},

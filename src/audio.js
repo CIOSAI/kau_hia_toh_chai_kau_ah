@@ -1,5 +1,7 @@
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 
+const centralA = 440.0;
+
 export class Beeper {
   constructor (ciosaigl) {
     this.ciosaigl = ciosaigl;
@@ -48,6 +50,20 @@ export class Beeper {
       shader: this.ciosaigl.initShader(`${this.shaderFPrefix}${fragment}${this.shaderFSuffix}`, this.quadShaderV),
     };
     return this.synths[name];
+  }
+
+  static pitch (note) {
+    if (!/[ABCDEFG][b\#]?[0-9]+/.test(note)) {
+      console.warn(`what format is ${note}? expected something like A#4, G6, Db2...`);
+    }
+    let name = note.match(/([ABCDEFG])([b\#]?)/);
+    let octave = parseInt(note.match(/[ABCDEFG][b\#]?([0-9]+)/)[1]);
+    let n = (
+      {A:0, B:2, C:3, D:5, E:7, F:8, G:10}[name[1]] + (name[2]?(name[2]==='b'?-1:1):0)
+    ) + (
+      (octave-(['A', 'B'].includes(name[1])?4:5)) * 12
+    );
+    return centralA*Math.pow(2.0, n/12.0); 
   }
 
   play (synth, params=[]) {
