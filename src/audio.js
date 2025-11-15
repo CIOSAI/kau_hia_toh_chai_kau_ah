@@ -7,7 +7,7 @@ export class Beeper {
     this.ciosaigl = ciosaigl;
     this.ctx = new AudioContext();
 
-    this.bufferDuration = 1.0; // in seconds
+    this.bufferDuration = 0.5; // in seconds
     this.buffer = new AudioBuffer(
       {numberOfChannels: 2, length: this.bufferDuration*this.ctx.sampleRate, sampleRate: this.ctx.sampleRate}
     );
@@ -64,6 +64,10 @@ export class Beeper {
       (octave-(['A', 'B'].includes(name[1])?4:5)) * 12
     );
     return centralA*Math.pow(2.0, n/12.0); 
+  }
+
+  static tet (division, n) {
+    return centralA*Math.pow(2.0, n/division);
   }
 
   play (synth, params=[]) {

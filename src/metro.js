@@ -25,17 +25,17 @@ export class Metro {
     this.connections = [];
     this.trains = [];
     this.shapes = {};
-    this.bell = this.beeper.initSynth('bell', `
+    /*this.bell = this.beeper.initSynth('bell', `
     vec2 song(float t) {
       float v = sin(t*pitch*TAU) * exp(-t*11.) * volume;
       return vec2(v); 
-    }`);
+    }`);*/
     
     console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.SHADING_LANGUAGE_VERSION));
     console.log(this.ciosaigl.gl.getParameter(this.ciosaigl.gl.VERSION));
   }
 
-  beep () {
+  /*beep () {
     if (!Object.hasOwn(this, 'uwu')) {this['uwu'] = 0;}
     else {this['uwu']++; this['uwu']=this['uwu']>=8?this['uwu']-8:this['uwu'];}
     let pitch = Beeper.pitch(['C5', 'D5', 'E5', 'F5', 'G5', 'A5', 'B5', 'C6'][this['uwu']]);
@@ -43,7 +43,7 @@ export class Metro {
       {type: 'float', key: 'pitch', value: pitch},
       {type: 'float', key: 'volume', value: 0.2},
     ]);
-  }
+  }*/
 
   createStation (name, color) {
     let station = new Station(Math.random()-0.5, Math.random()-0.5, name, color);
@@ -59,8 +59,15 @@ export class Metro {
     }
   }
 
-  createTrain (color, startingStation) {
-    let train = {line: color, fromSta: startingStation, toSta: startingStation, forward: true, perc: 0.0};
+  createTrain (color, startingStation, instrument, speed=0.01) {
+    let train = {
+      line: color, 
+      instrument: this.beeper.initSynth(instrument.name, instrument.fragment),
+      trigger: instrument.trigger,
+      speed: speed, 
+      fromSta: startingStation, toSta: startingStation, 
+      forward: true, perc: 0.0
+    };
     this.trains.push(train);
     this.setTrainRoute(train);
   }
@@ -77,12 +84,12 @@ export class Metro {
     return false;
   }
 
-  runTrain (speed) {
+  runTrain () {
     for (let train of this.trains) {
-      train.perc += speed;
+      train.perc += train.speed;
       if (train.perc<0) { train.perc = 0; }
       if (train.perc>1) {
-	this.beep();
+	this.beeper.play(train.instrument, train.trigger(train.toSta));
 	train.perc -= Math.floor(train.perc);
 	train.fromSta = train.toSta;
 	let hasNext = this.setTrainRoute(train);
