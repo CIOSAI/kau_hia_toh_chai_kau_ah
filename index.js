@@ -17,11 +17,13 @@ function start() {
   const BLUE = [0.1,0.5,0.9,1];
   const GREEN = [0.1,0.8,0.3,1];
   const YELLOW = [0.8,0.7,0.1,1];
+  const BROWN = [0.4,0.115,0.1,1];
 
-  let tamsuiXinyi = metro.entireLine(RED, [10, 1, 11, 2, 3, 12, 4, 5, 13]);
-  let zhongheXinlu = metro.entireLine(YELLOW, [14, 1, 15, 16, 6, 7, 5, 9, 17]);
-  let songshanXindian = metro.entireLine(GREEN, [18, 6, 2, 19, 8, 20, 4, 9, 21]);
-  let bannan = metro.entireLine(BLUE, [22, 8, 3, 23, 7, 24]);
+  let tamsuiXinyi = metro.entireLine(RED, [10, 1, 11, 2, 3, 12, 4, 5, 13, 26, 50, 51, 52]);
+  let zhongheXinlu = metro.entireLine(YELLOW, [14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
+  let songshanXindian = metro.entireLine(GREEN, [64, 65, 66, 18, 6, 2, 19, 8, 20, 4, 9, 21, 47, 48, 49, 67, 68, 69, 70]);
+  let wenhu = metro.entireLine(BROWN, [39, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 25, 18, 24, 26, 53, 54, 55, 56, 57, 58, 59, 60]);
+  let bannan = metro.entireLine(BLUE, [22, 8, 3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39]);
 
   function fract(n) { return n-Math.floor(n); }
   function genNoteGroup(seed, amt) {
@@ -118,6 +120,17 @@ float expease(float n, float deg) {
     trigger: (station)=>[
       {type: 'float', key: 'volume', value: 0.25}]
     }, 0.01);
+  metro.createTrain(BROWN, wenhu[0], {
+    name: 'silly',
+    fragment: `
+    vec2 song(float t) {
+      float v = sin(t*pitch*TAU) * exp(-t*21.) * volume;
+      return vec2(v); 
+    }`,
+    trigger: (station)=>[
+      {type: 'float', key: 'pitch', value: Beeper.tet(17, 17+melody(station.name, mainScale))},
+      {type: 'float', key: 'volume', value: 0.05}]
+    }, 0.1);
 
   let tpMain = metro.stations.filter(station=>station.name===4)[0];
 
@@ -125,7 +138,7 @@ float expease(float n, float deg) {
     ciosaigl.background([0.95,0.95,0.95,1]);
 
     // pretty good ratio {attract: .064, repulse: 0.0006, slippy: 0.8}
-    metro.physics({attract: .064, repulse: 0.0006, slippy: 0.8});
+    metro.physics({attract: .064, repulse: 0.0001, slippy: 0.6});
     metro.runTrain(0.01);
     tpMain.velx -= tpMain.x*.1;
     tpMain.vely -= tpMain.y*.1;
