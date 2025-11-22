@@ -138,10 +138,10 @@ float expease(float n, float deg) {
     ciosaigl.background([0.95,0.95,0.95,1]);
 
     // pretty good ratio {attract: .064, repulse: 0.0006, slippy: 0.8}
-    metro.physics({attract: .064, repulse: 0.0001, slippy: 0.6});
+    metro.physics({attract: 0.064, repulse: 0.0006, slippy: 0.2});
     metro.runTrain(0.01);
-    tpMain.velx -= tpMain.x*.1;
-    tpMain.vely -= tpMain.y*.1;
+    //tpMain.velx -= tpMain.x*16.0;
+    //tpMain.vely -= tpMain.y*16.0;
     metro.render();
   }, {oneFrame: false});
 }

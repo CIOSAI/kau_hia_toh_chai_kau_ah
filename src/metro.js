@@ -123,6 +123,7 @@ export class Metro {
     if (Object.hasOwn(param ,'repulse')) { repulse = param.repulse; }
     if (Object.hasOwn(param ,'slippy')) { slippy = param.slippy; }
 
+    /*
     for (let node of this.stations) {
       for (let other of this.stations) {
 	if (node===other) { continue; }
@@ -144,6 +145,44 @@ export class Metro {
       node.y += node.vely;
       node.velx *= slippy;
       node.vely *= slippy;
+    }*/
+
+    const SAMPLE = 24;
+    for (let i=0; i<this.connections.length*2; i++) {
+      let connection = this.connections[i%this.connections.length];
+      let node = connection.nodes[i>=this.connections.length?0:1];
+      let other = connection.nodes[i>=this.connections.length?1:0];
+      
+      let delx = other.x - node.x;
+      let dely = other.y - node.y;
+      let dist = Math.sqrt(delx*delx+dely*dely);
+      let norx = delx/dist;
+      let nory = dely/dist;
+      node.velx += norx * Math.sqrt(dist)*attract;
+      node.vely += nory * Math.sqrt(dist)*attract;
+
+      for (let poke=0; poke<SAMPLE; poke++) {
+	let other = this.stations[Math.floor(Math.random()*this.stations.length)];
+	if (other===node) { continue; }
+
+	let delx = other.x - node.x;
+	let dely = other.y - node.y;
+	let dist = Math.sqrt(delx*delx+dely*dely);
+	let norx = delx/(dist*dist);
+	let nory = dely/(dist*dist);
+      if (isNaN(norx)||isNaN(dist)) {
+	console.log(node);
+      }
+
+	node.velx += -norx * (repulse/dist) / SAMPLE;
+	node.vely += -nory * (repulse/dist) / SAMPLE;
+      }
+    }
+    for (let node of this.stations) {
+      node.velx *= slippy;
+      node.vely *= slippy;
+      node.x += node.velx;
+      node.y += node.vely;
     }
   }
 
