@@ -126,6 +126,7 @@ export class Metro {
     for (let node of this.stations) {
       for (let other of this.stations) {
 	if (node===other) { continue; }
+	if (Math.random()>0.1) { continue; }
 	let delx = other.x - node.x;
 	let dely = other.y - node.y;
 	let dist = Math.sqrt(delx*delx+dely*dely);
