@@ -15,6 +15,24 @@ class Station {
   }
 }
 
+class Train {
+  constructor (color, synth, trigger, speed, startingStation) {
+    this.line = color; 
+    this.instrument = synth;
+    this.trigger = trigger;
+    this.speed = speed;
+    this.fromSta = startingStation;
+    this.toSta = startingStation;
+    this.forward = true;
+    this.perc = 0.0;
+    this.sz = 1.0;
+  }
+
+  static ORIGINAL_SZ = 0.02;
+  static BOP_AMOUNT = 0.5;
+  static BOP_FALLOFF = 0.65;
+}
+
 export class Metro {
   constructor (ciosaigl, beeper) {
     this.ciosaigl = ciosaigl;
@@ -44,14 +62,13 @@ export class Metro {
   }
 
   createTrain (color, startingStation, instrument, speed=0.01) {
-    let train = {
-      line: color, 
-      instrument: this.beeper.initSynth(instrument.name, instrument.fragment),
-      trigger: instrument.trigger,
-      speed: speed, 
-      fromSta: startingStation, toSta: startingStation, 
-      forward: true, perc: 0.0
-    };
+    let train = new Train(
+      color,
+      this.beeper.initSynth(instrument.name, instrument.fragment),
+      instrument.trigger,
+      speed,
+      startingStation,
+    );
     this.trains.push(train);
     this.setTrainRoute(train);
   }
@@ -74,6 +91,7 @@ export class Metro {
       if (train.perc<0) { train.perc = 0; }
       if (train.perc>1) {
 	this.beeper.play(train.instrument, train.trigger(train.toSta));
+	train.sz += Train.BOP_AMOUNT;
 	train.perc -= Math.floor(train.perc);
 	train.fromSta = train.toSta;
 	let hasNext = this.setTrainRoute(train);
@@ -232,12 +250,14 @@ export class Metro {
     for (let t of this.trains) {
       let x = t.fromSta.x*(1.0-t.perc) + t.toSta.x*t.perc;
       let y = t.fromSta.y*(1.0-t.perc) + t.toSta.y*t.perc;
+      let sz = Train.ORIGINAL_SZ*t.sz;
+      t.sz = 1+Math.max(0., t.sz-1)*Train.BOP_FALLOFF;
       this.ciosaigl.xform(Trans.multAll([
 	Trans.scale(9/16,1,1),
 	globTrans,
 	Trans.xlate(x, y, 0),
 	globInvert,
-	Trans.scale(sz*2, sz*2, sz*2),
+	Trans.scale(sz, sz, sz),
       ]));
       this.ciosaigl.color(t.line);
       this.ciosaigl.drawShape(this.shapes['circle']);
