@@ -17,6 +17,7 @@ function start() {
   const BLUE = [0.1,0.5,0.9,1];
   const GREEN = [0.1,0.8,0.3,1];
   const ORANGE = [0.95,0.6,0.1,1];
+  const YELLOW = [0.9,0.85,0.0,1];
   const BROWN = [0.6,0.115,0.1,1];
 
   let tamsuiXinyi = metro.entireLine(RED, [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 10, 1, 11, 2, 3, 12, 4, 5, 13, 26, 50, 51, 52]);
@@ -24,7 +25,8 @@ function start() {
   let zhongheXinlu1 = metro.entireLine(ORANGE, [90, 91, 92, 93, 94, 95, 96, 97, 98, 14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
   let songshanXindian = metro.entireLine(GREEN, [64, 65, 66, 18, 6, 2, 19, 8, 20, 4, 9, 21, 47, 48, 49, 67, 68, 69, 70]);
   let wenhu = metro.entireLine(BROWN, [39, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 25, 18, 24, 26, 53, 54, 55, 56, 57, 58, 59, 60]);
-  let bannan = metro.entireLine(BLUE, [22, 8, 3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39]);
+  let bannan = metro.entireLine(BLUE, [99, 100, 101, 102, 103, 104, 105, 106, 107, 22, 8, 3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39]);
+  let circleLine = metro.entireLine(YELLOW, [108, 109, 94, 106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67]);
 
   function fract(n) { return n-Math.floor(n); }
   function genNoteGroup(seed, amt) {
@@ -132,6 +134,17 @@ float expease(float n, float deg) {
       {type: 'float', key: 'pitch', value: Beeper.tet(17, 17+melody(station.name, mainScale))},
       {type: 'float', key: 'volume', value: 0.05}]
     }, 0.1);
+  metro.createTrain(YELLOW, circleLine[0], {
+    name: 'goofy',
+    fragment: `
+    vec2 song(float t) {
+      vec2 v = sign(sin(vec2(sin(t*87.),cos(t*42.))+t*pitch*TAU)) * exp(-t*4.) * volume;
+      return v; 
+    }`,
+    trigger: (station)=>[
+      {type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
+      {type: 'float', key: 'volume', value: 0.02}]
+    }, 0.03);
 
   let tpMain = metro.stations.filter(station=>station.name===4)[0];
 
