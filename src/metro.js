@@ -103,8 +103,10 @@ export class Metro {
 
   entireLine (color, list) {
     let stationList = [];
-    let station = this.createStation(list[0], color);
+    let exists = this.stations.find(s=>s.name===list[0]);
+    let station = exists?exists:this.createStation(list[0], color);
     stationList.push(station);
+    
     for (let i=1; i<list.length; i++) {
       let exists = this.stations.find(s=>s.name===list[i]);
       let next = exists?exists:this.createStation(list[i], color);
