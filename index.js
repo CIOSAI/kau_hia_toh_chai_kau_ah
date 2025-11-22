@@ -44,15 +44,13 @@ function start() {
   }
   const mainScale = genNoteGroup(8, 5);
 
-  let tamsuiXinyi = metro.entireLine(RED, [12, 4, 5]);
+  let tamsuiXinyi = metro.entireLine(RED, [2, 3, 12]);
+  let bannan;
   //let zhongheXinlu = metro.entireLine(ORANGE, [71, 72, 73, 74, 75, 14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
   //let zhongheXinlu1 = metro.entireLine(ORANGE, [90, 91, 92, 93, 94, 95, 96, 97, 98, 14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
   //let songshanXindian = metro.entireLine(GREEN, [64, 65, 66, 18, 6, 2, 19, 8, 20, 4, 9, 21, 47, 48, 49, 67, 68, 69, 70]);
   //let wenhu = metro.entireLine(BROWN, [39, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 25, 18, 24, 26, 53, 54, 55, 56, 57, 58, 59, 60]);
-  //let bannan = metro.entireLine(BLUE, [99, 100, 101, 102, 103, 104, 105, 106, 107, 22, 8, 3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39]);
   //let circleLine = metro.entireLine(YELLOW, [108, 109, 94, 106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67]);
-
-  //metro.stations.find(station=>station.name===4);
 
   metro.createTrain(RED, tamsuiXinyi[0], {
     name: 'bell',
@@ -66,30 +64,44 @@ function start() {
       {type: 'float', key: 'volume', value: 0.1}]
     }, 0.05);
   
-  setTimeout(()=>{
-    const TO_ADD = [5, 13, 26, 50, 51, 52];
-    let i = 0;
-    let timerId = setInterval(()=>{
-      metro.entireLine(RED, [TO_ADD[i], TO_ADD[i+1]]);
-      i += 1;
-      if (i+1>=TO_ADD.length) { clearInterval(timerId); }
-    }, 3000);
-  }, 2500);
+  function addSeries(list, line, delay, interval, invert=false) {
+    setTimeout(()=>{
+      let i = 0;
+      let timerId = setInterval(()=>{
+	invert?
+	  metro.entireLine(line, [list[i+1], list[i]]):
+	  metro.entireLine(line, [list[i], list[i+1]]);
+	i += 1;
+	if (i+1>=list.length) { clearInterval(timerId); }
+      }, interval);
+    }, delay);
+  }
+
+  addSeries([12, 4, 5, 13, 26, 50, 51, 52], RED, 2000, 3000);
+  //RED [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 10, 1, 11, 2];
   
-  [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 10, 1, 11, 2, 3, 12];
+  setTimeout(()=>{
+    bannan = [metro.stations.find(station=>station.name===3)];
+    metro.createTrain(BLUE, bannan[0], {
+      name: 'waa',
+      fragment: `
+      vec2 song(float t) {
+	float v = sign(sin(t*pitch*TAU)) * smoothstep(0.0, 0.15, t) * exp(-t*3.) * volume;
+	return vec2(v); 
+      }`,
+      trigger: (station)=>[
+	{type: 'float', key: 'pitch', value: Beeper.tet(17, -34+melody(station.name, mainScale))},
+	{type: 'float', key: 'volume', value: 0.1}]
+      }, 0.015);
+  }, 10*1000);
+
+  addSeries([3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39], BLUE, 10*1000, 4300);
+  addSeries([3, 8, 22, 107, 106, 105, 104, 103, 102, 101, 100, 99], BLUE, 11*1000, 5900, true);
+
+
+
 
   /*
-  metro.createTrain(BLUE, bannan[0], {
-    name: 'waa',
-    fragment: `
-    vec2 song(float t) {
-      float v = sign(sin(t*pitch*TAU)) * smoothstep(0.0, 0.15, t) * exp(-t*3.) * volume;
-      return vec2(v); 
-    }`,
-    trigger: (station)=>[
-      {type: 'float', key: 'pitch', value: Beeper.tet(17, -34+melody(station.name, mainScale))},
-      {type: 'float', key: 'volume', value: 0.1}]
-    }, 0.015);
   metro.createTrain(GREEN, songshanXindian[0], {
     name: 'hat',
     fragment: `
