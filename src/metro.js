@@ -168,8 +168,8 @@ export class Metro {
 	let delx = other.x - node.x;
 	let dely = other.y - node.y;
 	let dist = Math.sqrt(delx*delx+dely*dely);
-	let norx = delx/(dist*dist);
-	let nory = dely/(dist*dist);
+	let norx = delx/Math.max(0.1, dist*dist);
+	let nory = dely/Math.max(0.1, dist*dist);
       if (isNaN(norx)||isNaN(dist)) {
 	console.log(node);
       }

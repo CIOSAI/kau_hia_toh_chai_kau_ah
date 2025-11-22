@@ -16,11 +16,12 @@ function start() {
   const RED = [0.9,0.1,0.2,1];
   const BLUE = [0.1,0.5,0.9,1];
   const GREEN = [0.1,0.8,0.3,1];
-  const YELLOW = [0.8,0.7,0.1,1];
-  const BROWN = [0.4,0.115,0.1,1];
+  const ORANGE = [0.95,0.6,0.1,1];
+  const BROWN = [0.6,0.115,0.1,1];
 
-  let tamsuiXinyi = metro.entireLine(RED, [10, 1, 11, 2, 3, 12, 4, 5, 13, 26, 50, 51, 52]);
-  let zhongheXinlu = metro.entireLine(YELLOW, [14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
+  let tamsuiXinyi = metro.entireLine(RED, [76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 10, 1, 11, 2, 3, 12, 4, 5, 13, 26, 50, 51, 52]);
+  let zhongheXinlu = metro.entireLine(ORANGE, [71, 72, 73, 74, 75, 14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
+  let zhongheXinlu1 = metro.entireLine(ORANGE, [90, 91, 92, 93, 94, 95, 96, 97, 98, 14, 1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63]);
   let songshanXindian = metro.entireLine(GREEN, [64, 65, 66, 18, 6, 2, 19, 8, 20, 4, 9, 21, 47, 48, 49, 67, 68, 69, 70]);
   let wenhu = metro.entireLine(BROWN, [39, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 25, 18, 24, 26, 53, 54, 55, 56, 57, 58, 59, 60]);
   let bannan = metro.entireLine(BLUE, [22, 8, 3, 23, 7, 24, 40, 41, 42, 43, 44, 45, 46, 39]);
@@ -107,7 +108,7 @@ vec2 spray( float t, float freq, float spread, float seed, float interval, int c
     trigger: (station)=>[
       {type: 'float', key: 'volume', value: 0.02+Math.random()*0.05}]
     }, 0.04);
-  metro.createTrain(YELLOW, zhongheXinlu[0], {
+  metro.createTrain(ORANGE, zhongheXinlu[0], {
     name: 'kick',
     fragment: `
 float expease(float n, float deg) {
@@ -138,7 +139,7 @@ float expease(float n, float deg) {
     ciosaigl.background([0.95,0.95,0.95,1]);
 
     // pretty good ratio {attract: .064, repulse: 0.0006, slippy: 0.8}
-    metro.physics({attract: 0.064, repulse: 0.0006, slippy: 0.2});
+    metro.physics({attract: 0.01, repulse: 0.00022, slippy: 0.6});
     metro.runTrain(0.01);
     //tpMain.velx -= tpMain.x*16.0;
     //tpMain.vely -= tpMain.y*16.0;
