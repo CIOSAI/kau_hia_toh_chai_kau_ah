@@ -18,11 +18,35 @@ function start() {
   const GREEN = [0.1,0.8,0.3,1];
   const YELLOW = [0.8,0.7,0.1,1];
 
-  let tamsuiXinyi = metro.entireLine(RED, ['Yuanshan', 'Minquan W. Rd.', 'Shuanglian', 'Zhongshan', 'Taipei Main', 'NTU Hospital', 'Chiang Kai-shek Memorial Hall', 'Dongmen', 'Daan Park']);
-  let zhongheXinlu = metro.entireLine(YELLOW, ['Daqiaotou', 'Minquan W. Rd.', 'Zhongshan Elementary School', 'Xingtian Temple', 'Songjiang Nanjing', 'Zhongxiao Xinsheng', 'Dongmen', 'Guting', 'Dingxi']);
-  let songshanXindian = metro.entireLine(GREEN, ['Nanjing Fuxing', 'Songjiang Nanjing', 'Zhongshan', 'Beimen', 'Ximen', 'Xiaonanmen', 'Chiang Kai-shek Memorial Hall', 'Guting', 'Taipower Building']);
-  let bannan = metro.entireLine(BLUE, ['Longshan Temple', 'Ximen', 'Taipei Main', 'Shandao Temple', 'Zhongxiao Xinsheng', 'Zhongxiao Fuxing']);
-  
+  let tamsuiXinyi = metro.entireLine(RED, [10, 1, 11, 2, 3, 12, 4, 5, 13]);
+  let zhongheXinlu = metro.entireLine(YELLOW, [14, 1, 15, 16, 6, 7, 5, 9, 17]);
+  let songshanXindian = metro.entireLine(GREEN, [18, 6, 2, 19, 8, 20, 4, 9, 21]);
+  let bannan = metro.entireLine(BLUE, [22, 8, 3, 23, 7, 24]);
+
+  function fract(n) { return n-Math.floor(n); }
+  function genNoteGroup(seed, amt) {
+    if (amt<1) { console.warn(`unable to make note group of length ${amt}, make sure amt is a positive integer`); return [0, 1, 2]; }
+    let group = [seed];
+    let stride = amt;
+    for (let i=0; i<amt; i++) {
+      let nextNote = group[group.length-1]+stride+Math.round(Math.sin(seed*8+stride));
+      if (group.length < 5) {
+	nextNote = nextNote % 17;
+      }
+      if (group.length < 9) {
+	nextNote = nextNote % 34;
+      }
+      group.push(nextNote);
+      stride = Math.max(1, stride-1);
+    }
+    return group;
+  }
+  function melody(seed, selection) {
+    let r = fract(Math.sin(seed*131.933)*466.462);
+    return selection[Math.floor(r*selection.length)];
+  }
+  const mainScale = genNoteGroup(8, 5);
+
   metro.createTrain(RED, tamsuiXinyi[0], {
     name: 'bell',
     fragment: `
@@ -31,20 +55,20 @@ function start() {
       return vec2(v); 
     }`,
     trigger: (station)=>[
-      {type: 'float', key: 'pitch', value: Beeper.tet(17, Math.floor(Math.random()*17))},
-      {type: 'float', key: 'volume', value: 0.2}]
-    }, 0.01);
+      {type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
+      {type: 'float', key: 'volume', value: 0.1}]
+    }, 0.05);
   metro.createTrain(BLUE, bannan[0], {
     name: 'waa',
     fragment: `
     vec2 song(float t) {
-      float v = sign(sin(t*pitch*TAU)) * smoothstep(0.0, 0.15, t) * exp(-t*11.) * volume;
+      float v = sign(sin(t*pitch*TAU)) * smoothstep(0.0, 0.15, t) * exp(-t*3.) * volume;
       return vec2(v); 
     }`,
     trigger: (station)=>[
-      {type: 'float', key: 'pitch', value: Beeper.tet(17, -17+Math.floor(Math.random()*17))},
+      {type: 'float', key: 'pitch', value: Beeper.tet(17, -34+melody(station.name, mainScale))},
       {type: 'float', key: 'volume', value: 0.1}]
-    }, 0.02);
+    }, 0.015);
   metro.createTrain(GREEN, songshanXindian[0], {
     name: 'hat',
     fragment: `
@@ -79,8 +103,8 @@ vec2 spray( float t, float freq, float spread, float seed, float interval, int c
       return vec2(v); 
     }`,
     trigger: (station)=>[
-      {type: 'float', key: 'volume', value: 0.05+Math.random()*0.1}]
-    }, 0.015);
+      {type: 'float', key: 'volume', value: 0.02+Math.random()*0.05}]
+    }, 0.04);
   metro.createTrain(YELLOW, zhongheXinlu[0], {
     name: 'kick',
     fragment: `
@@ -92,10 +116,10 @@ float expease(float n, float deg) {
       return vec2(v); 
     }`,
     trigger: (station)=>[
-      {type: 'float', key: 'volume', value: 0.2}]
-    }, 0.007);
+      {type: 'float', key: 'volume', value: 0.25}]
+    }, 0.01);
 
-  let tpMain = metro.stations.filter(station=>station.name==='Taipei Main')[0];
+  let tpMain = metro.stations.filter(station=>station.name===4)[0];
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
