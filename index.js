@@ -307,5 +307,5 @@ function start() {
   }, {oneFrame: false});
 }
 
-//startButton.onclick = (e)=>{start();};
-start();
+startButton.onclick = (e)=>{start();};
+//start();
