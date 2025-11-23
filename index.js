@@ -53,6 +53,11 @@ function start() {
   let zhongheXinlu;
   let circleLine;
 
+  let kickEffects = {
+    tug: false,
+    tugForce: 0.4,
+  };
+
   let trainRed1 = metro.createTrain(RED, tamsuiXinyi[0], {
     name: 'bell',
     fragment: `
@@ -112,9 +117,28 @@ function start() {
 	float v = tanh(sin(1700.*t-expease(t,4.)*600.)*mix(5.,2.,t)) * exp(-t*16.) * volume;
 	return vec2(v); 
       }`,
-      trigger: (station)=>[
-	{type: 'float', key: 'volume', value: 0.25}]
-      }, 0.01);
+      trigger: (station)=>{
+	if (kickEffects.tug) {
+	  const SAMPLES = 32;
+	  let dir = {
+	    x: Math.random()*2-1,
+	    y: Math.random()*2-1
+	  };
+	  let l = Math.sqrt(dir.x*dir.x+dir.y*dir.y);
+	  dir.x /= l;
+	  dir.y /= l;
+
+	  for (let i=0; i<SAMPLES; i++) {
+	    let sta = metro.stations[Math.floor(Math.random()*metro.stations.length)];
+	    sta.x += dir.x*kickEffects.tugForce;
+	    sta.y += dir.y*kickEffects.tugForce;
+	  }
+	}
+	return [
+	  {type: 'float', key: 'volume', value: 0.25}
+	];
+      }
+    }, 0.01);
   }, 20*1000);
 
   addSeries([2, 19, 8, 20, 4, 9, 21, 47, 48, 49, 67, 68, 69, 70], GREEN, 20*1000, 1200);
@@ -181,6 +205,10 @@ function start() {
   addSeries([1, 15, 16, 6, 7, 5, 9, 17, 61, 62, 63], ORANGE, 35*1000, 600);
   addSeries([1, 14, 75, 74, 73, 72, 71], ORANGE, 37*1000, 600, true);
   addSeries([14, 98, 97, 96, 95, 94, 93, 92, 91, 90], ORANGE, 39*1000, 600, true);
+
+  setTimeout(()=>{
+    kickEffects.tug = true;
+  }, 40*1000);
 
   setTimeout(()=>{
     circleLine = [metro.stations.find(station=>station.name===106)];
