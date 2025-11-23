@@ -57,6 +57,14 @@ function start() {
     tug: false,
     tugForce: 0.4,
   };
+  let trainSlowing = false;
+
+  setInterval(()=>{
+    if (!trainSlowing) {return;}
+    for (let train of metro.trains) {
+      train.speed *= 0.95;
+    }
+  }, 200);
 
   let trainRed1 = metro.createTrain(RED, tamsuiXinyi[0], {
     name: 'bell',
@@ -226,6 +234,36 @@ function start() {
   }, 45*1000);
   addSeries([106, 94, 109, 108], YELLOW, 45*1000, 1600, true);
   addSeries([106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67], YELLOW, 45*1000, 1600);
+
+  let stashConnections = [];
+  let stashSpeeds = [];
+  setTimeout(()=>{
+    let cutAmount = metro.connections.length*0.5;
+    for (let i=0; i<cutAmount; i++) {
+      let cutPosition = Math.floor(Math.random()*(metro.connections.length-1));
+      stashConnections.push(metro.connections[cutPosition]);
+      metro.connections = metro.connections.slice(0, cutPosition
+	).concat(metro.connections.slice(cutPosition+1));
+    }
+
+    trainSlowing = true;
+    for (let train of metro.trains) {
+      stashSpeeds.push({train: train, speed: train.speed});
+    }
+  }, 70*1000);
+
+  setTimeout(()=>{
+    let connection = stashConnections.pop();
+    while (connection) {
+      metro.connections.push(connection);
+      connection = stashConnections.pop();
+    }
+    
+    trainSlowing = false;
+    for (let train of metro.trains) {
+      train.speed = stashSpeeds.find(record=>record.train===train).speed;
+    }
+  }, 90*1000);
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
