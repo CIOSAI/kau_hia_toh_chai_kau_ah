@@ -1,6 +1,7 @@
 import { CiosaiGL } from "./lib/ciosaigl/index.js";
 import { Metro } from "./src/metro.js";
 import { Beeper } from "./src/audio.js";
+import * as ShowText from "./src/text.js";
 import * as Matrix from "./lib/ciosaigl/src/matrix.js";
 
 let canvas = document.getElementById('the-canvas');
@@ -12,7 +13,8 @@ let ciosaigl = new CiosaiGL(gl);
 let metro = new Metro(ciosaigl, new Beeper(ciosaigl));
 
 function start() {
-  canvas.requestFullscreen();
+  startButton.style.display = 'none';
+  document.body.requestFullscreen();
 
   const RED = [0.9,0.1,0.2,1];
   const BLUE = [0.1,0.5,0.9,1];
@@ -264,6 +266,9 @@ function start() {
       train.speed = stashSpeeds.find(record=>record.train===train).speed;
     }
   }, 90*1000);
+
+  let scroller = ShowText.createText('台北 - 一月 17 - 運算子數位藝術節');
+  ShowText.addToRack(scroller);
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
