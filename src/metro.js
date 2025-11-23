@@ -71,6 +71,7 @@ export class Metro {
     );
     this.trains.push(train);
     this.setTrainRoute(train);
+    return train;
   }
 
   setTrainRoute (train) {
@@ -204,6 +205,7 @@ export class Metro {
         Trans.scale(9/16,1,1),
 	globTrans,
         Trans.scale(1, 1, 1),
+	globInvert,
       ]));
       this.ciosaigl.color(c.color);
       this.ciosaigl.drawShape(this.shapes['capsule']);
