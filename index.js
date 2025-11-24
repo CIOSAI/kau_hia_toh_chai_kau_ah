@@ -252,7 +252,7 @@ function start() {
     for (let train of metro.trains) {
       stashSpeeds.push({train: train, speed: train.speed});
     }
-  }, 70*1000);
+  }, 60*1000);
 
   setTimeout(()=>{
     let connection = stashConnections.pop();
@@ -265,7 +265,7 @@ function start() {
     for (let train of metro.trains) {
       train.speed = stashSpeeds.find(record=>record.train===train).speed;
     }
-  }, 90*1000);
+  }, 80*1000);
 
   let scroller = ShowText.createText('台北 - 一月 17 - 運算子數位藝術節');
   ShowText.addToRack(scroller);
