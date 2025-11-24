@@ -61,6 +61,7 @@ function start() {
     tugForce: 0.4,
   };
   let trainSlowing = false;
+  let hopTrain;
 
   let titleHan = ShowText.createText('«到遐就知到矣»');
   let titleLtn = ShowText.createText('"Kàu hia to̍h chai kàu ah"');
@@ -74,21 +75,9 @@ function start() {
   setInterval(()=>{
     if (!trainSlowing) {return;}
     for (let train of metro.trains) {
-      train.speed *= 0.95;
+      train.speed *= 0.98;
     }
   }, 200);
-
-  let trainRed1 = metro.createTrain(RED, tamsuiXinyi[0], {
-    name: 'bell',
-    fragment: `
-    vec2 song(float t) {
-      float v = sin(t*pitch*TAU) * exp(-t*11.) * volume;
-      return vec2(v); 
-    }`,
-    trigger: (station)=>[
-      {type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
-      {type: 'float', key: 'volume', value: 0.1}]
-    }, 0.05);
   
   function addSeries(list, line, delay, interval, invert=false) {
     setTimeout(()=>{
@@ -102,6 +91,23 @@ function start() {
       }, interval);
     }, delay);
   }
+
+  let trainRed1 = metro.createTrain(RED, tamsuiXinyi[0], {
+    name: 'bell',
+    fragment: `
+    vec2 song(float t) {
+      float v = sin(t*pitch*TAU) * exp(-t*11.) * volume;
+      return vec2(v); 
+    }`,
+    trigger: (station)=>{
+      hopTrain = metro.trains[Math.floor(Math.random()*metro.trains.length)];
+      return [
+	{type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
+	{type: 'float', key: 'volume', value: 0.1}
+      ];
+    }
+    }, 0.05);
+  hopTrain = trainRed1;
 
   addSeries([12, 4, 5, 13, 26, 50, 51, 52], RED, 2000, 3000);
   
@@ -284,24 +290,24 @@ function start() {
   setTimeout(()=>{
     ShowText.addToRack(authorHan);
     ShowText.addToRack(authorLtn);
-  }, 63*1000);
+  }, 64*1000);
   setTimeout(()=>{
     titleHan.style.display = 'none';
     titleLtn.style.display = 'none';
     authorHan.style.display = 'none';
     authorLtn.style.display = 'none';
-  }, 68*1000);
+  }, 70*1000);
 
   setTimeout(()=>{
     ShowText.addToRack(inviteHan);
     ShowText.addToRack(inviteLtn);
-  }, 70*1000);
+  }, 72*1000);
   setTimeout(()=>{
     inviteHan.style.display = 'none';
     inviteLtn.style.display = 'none';
     ShowText.addToRack(partyInfoHan);
     ShowText.addToRack(partyInfoLtn);
-  }, 73*1000);
+  }, 75*1000);
   setTimeout(()=>{
     let randSwapWith = (text, a) => {
       let ind = Math.floor(Math.random()*text.length);
@@ -357,8 +363,19 @@ function start() {
       let perc = (time-10)/20;
       zoom = mix(5, 0.75, Math.pow(perc,0.3));
     }
-    else {
+    else if (time<80) {
       zoom = 0.75;
+    }
+    else if (time<90) {
+      let perc = (time-80)/10;
+      zoom = mix(0.75, 1, Math.pow(perc,0.3));
+    }
+    else if (time<120) {
+      let perc = (time-90)/30;
+      zoom = mix(1, 4, Math.pow(perc,0.5));
+    }
+    else {
+      zoom = 1;
     }
     let xlate = {x: 0, y:0};
     if (time<10) {
@@ -370,6 +387,14 @@ function start() {
       perc = 1-Math.pow(perc, 0.6);
       xlate.x = -mix(trainRed1.fromSta.x, trainRed1.toSta.x, trainRed1.perc) * perc;
       xlate.y = -mix(trainRed1.fromSta.y, trainRed1.toSta.y, trainRed1.perc) * perc;
+    }
+    else if (time<90) {
+      xlate.x = 0;
+      xlate.y = 0;
+    }
+    else if (time<120) {
+      xlate.x = -mix(hopTrain.fromSta.x, hopTrain.toSta.x, hopTrain.perc);
+      xlate.y = -mix(hopTrain.fromSta.y, hopTrain.toSta.y, hopTrain.perc);
     }
     else {
       xlate.x = 0;
