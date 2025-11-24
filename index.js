@@ -46,7 +46,8 @@ function start() {
     let r = fract(Math.sin(seed*131.933)*466.462);
     return selection[Math.floor(r*selection.length)];
   }
-  const mainScale = genNoteGroup(8, 5);
+  let mainScale = genNoteGroup(8, 5);
+  let secondScale = genNoteGroup(0, 7)
 
   let tamsuiXinyi = metro.entireLine(RED, [2, 3, 12]);
   let bannan;
@@ -330,6 +331,15 @@ function start() {
 	partyInfoLtn.style.opacity = 1;
       }
     },150);
+  }, 80*1000);
+
+  setTimeout(()=>{
+    while (mainScale.length>0) {
+      mainScale.pop();
+    }
+    for (let note of secondScale) {
+      mainScale.push(note);
+    }
   }, 80*1000);
 
   ciosaigl.run((time)=>{
