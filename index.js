@@ -242,9 +242,9 @@ function start() {
 	{type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
 	{type: 'float', key: 'volume', value: 0.02}]
       }, 0.03);
-  }, 45*1000);
-  addSeries([106, 94, 109, 108], YELLOW, 45*1000, 1600, true);
-  addSeries([106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67], YELLOW, 45*1000, 1600);
+  }, 40*1000);
+  addSeries([106, 94, 109, 108], YELLOW, 40*1000, 1600, true);
+  addSeries([106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67], YELLOW, 41*1000, 1600);
 
   let stashConnections = [];
   let stashSpeeds = [];
