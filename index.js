@@ -61,6 +61,15 @@ function start() {
   };
   let trainSlowing = false;
 
+  let titleHan = ShowText.createText('«到遐就知到矣»');
+  let titleLtn = ShowText.createText('"Kàu hia to̍h chai kàu ah"');
+  let authorHan = ShowText.createText('石獅 作');
+  let authorLtn = ShowText.createText('presented by CIOSAI');
+  let inviteHan = ShowText.createText('請汝做伙來-');
+  let inviteLtn = ShowText.createText('you\'ve been invited to join-');
+  let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
+  let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
+
   setInterval(()=>{
     if (!trainSlowing) {return;}
     for (let train of metro.trains) {
@@ -267,8 +276,61 @@ function start() {
     }
   }, 80*1000);
 
-  let scroller = ShowText.createText('台北 - 一月 17 - 運算子數位藝術節');
-  ShowText.addToRack(scroller);
+  setTimeout(()=>{
+    ShowText.addToRack(titleHan);
+    ShowText.addToRack(titleLtn);
+  }, 61*1000);
+  setTimeout(()=>{
+    ShowText.addToRack(authorHan);
+    ShowText.addToRack(authorLtn);
+  }, 63*1000);
+  setTimeout(()=>{
+    titleHan.style.display = 'none';
+    titleLtn.style.display = 'none';
+    authorHan.style.display = 'none';
+    authorLtn.style.display = 'none';
+  }, 68*1000);
+
+  setTimeout(()=>{
+    ShowText.addToRack(inviteHan);
+    ShowText.addToRack(inviteLtn);
+  }, 70*1000);
+  setTimeout(()=>{
+    inviteHan.style.display = 'none';
+    inviteLtn.style.display = 'none';
+    ShowText.addToRack(partyInfoHan);
+    ShowText.addToRack(partyInfoLtn);
+  }, 73*1000);
+  setTimeout(()=>{
+    let randSwapWith = (text, a) => {
+      let ind = Math.floor(Math.random()*text.length);
+      if (ind===text.length-1) {
+	return text.slice(0,ind)+a;
+      }
+      else {
+	return text.slice(0,ind)+a+text.slice(ind+1);
+      }
+    };
+    let count = 60;
+    let glitchOut = setInterval(()=>{
+      if (partyInfoHan.textContent.length<99 && Math.random()<0.1) {
+	partyInfoHan.textContent = partyInfoHan.textContent.repeat(2);
+	partyInfoLtn.textContent = partyInfoLtn.textContent.repeat(2);
+      }
+      partyInfoHan.textContent = randSwapWith(partyInfoHan.textContent, '→');
+      partyInfoLtn.textContent = randSwapWith(partyInfoLtn.textContent, '→');
+      partyInfoHan.style.opacity = count/60;
+      partyInfoLtn.style.opacity = count/60;
+      count -= 1;
+      if (count<=0) {
+	clearInterval(glitchOut);
+	partyInfoHan.style.display = 'none';
+	partyInfoLtn.style.display = 'none';
+	partyInfoHan.style.opacity = 1;
+	partyInfoLtn.style.opacity = 1;
+      }
+    },150);
+  }, 80*1000);
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
