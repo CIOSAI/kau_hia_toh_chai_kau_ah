@@ -4,6 +4,7 @@ class Station {
   constructor (x, y, name, color) {
     this.x = x;
     this.y = y;
+    this.z = (Math.random()*2-1)*0.05;
     this.velx = 0;
     this.vely = 0;
     this.name = name;
@@ -11,7 +12,7 @@ class Station {
   }
 
   toVec4 () {
-    return [this.x, this.y, 0, 1];
+    return [this.x, this.y, this.z, 1];
   }
 }
 
@@ -219,7 +220,7 @@ export class Metro {
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
 	  globTrans,
-	  Trans.xlate(s.x, s.y, 0),
+	  Trans.xlate(s.x, s.y, s.z),
 	  globInvert,
 	  Trans.scale(sz*1.5, sz*1.5, sz*1.5),
 	]));
@@ -229,7 +230,7 @@ export class Metro {
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
 	  globTrans,
-	  Trans.xlate(s.x, s.y, 0),
+	  Trans.xlate(s.x, s.y, s.z),
 	  globInvert,
 	  Trans.scale(sz, sz, sz),
 	]));
@@ -240,7 +241,7 @@ export class Metro {
 	this.ciosaigl.xform(Trans.multAll([
 	  Trans.scale(9/16,1,1),
 	  globTrans,
-	  Trans.xlate(s.x, s.y, 0),
+	  Trans.xlate(s.x, s.y, s.z),
 	  globInvert,
 	  Trans.scale(sz, sz, sz),
 	]));
@@ -251,12 +252,13 @@ export class Metro {
     for (let t of this.trains) {
       let x = t.fromSta.x*(1.0-t.perc) + t.toSta.x*t.perc;
       let y = t.fromSta.y*(1.0-t.perc) + t.toSta.y*t.perc;
+      let z = t.fromSta.z*(1.0-t.perc) + t.toSta.z*t.perc;
       let sz = Train.ORIGINAL_SZ*t.sz;
       t.sz = 1+Math.max(0., t.sz-1)*Train.BOP_FALLOFF;
       this.ciosaigl.xform(Trans.multAll([
 	Trans.scale(9/16,1,1),
 	globTrans,
-	Trans.xlate(x, y, 0),
+	Trans.xlate(x, y, z),
 	globInvert,
 	Trans.scale(sz, sz, sz),
       ]));
