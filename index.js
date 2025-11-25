@@ -81,7 +81,7 @@ function start() {
   let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
   let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
   let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 64);
-  const GREETZ = 'stargaze\nwrighter\n0b5vr\nSession Orgas\nLow Score Boy\nFL_YANG\njrwei\nananq_0w0\nwhereischappie\npsenough\nocf.tw\ng0v.tw\nAtsushi Eno\nAmos Li'.split('\n');
+  const GREETZ = 'stargaze,wrighter,0b5vr,Session Orgas,Low Score Boy,FL_YANG,jrwei,ananq_0w0,whereischappie,psenough,ocf.tw,g0v.tw,Atsushi Eno,Amos Li'.split(',');
   let greetzLtn = ShowText.createText(GREETZ[0]);
   ShowText.addToRack(greetzLtn);
   greetzLtn.style.display = 'none';
