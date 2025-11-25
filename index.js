@@ -3,6 +3,7 @@ import { Metro } from "./src/metro.js";
 import { Beeper } from "./src/audio.js";
 import * as ShowText from "./src/text.js";
 import * as Matrix from "./lib/ciosaigl/src/matrix.js";
+import {TAU} from "./lib/ciosaigl/src/util.js";
 
 let canvas = document.getElementById('the-canvas');
 let startButton = document.getElementById('start');
@@ -358,6 +359,10 @@ function start() {
     }
   }, 80*1000);
 
+  setTimeout(()=>{
+    kickEffects.tug = false;
+  }, 120*1000);
+
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
 
@@ -379,8 +384,13 @@ function start() {
       }
     }
 
-    // pretty good ratio {attract: .064, repulse: 0.0006, slippy: 0.8}
-    metro.physics({attract: 0.01, repulse: 0.00022, slippy: 0.6});
+    let rotate = 0;
+    if (time<120) {
+      metro.physics({attract: 0.01, repulse: 0.00022, slippy: 0.6});
+    }
+    else if (time<130) {
+      rotate = ((time-120)/10)*TAU/4;
+    }
     metro.runTrain(0.01);
 
     let zoom = 1;
@@ -430,10 +440,12 @@ function start() {
     }
     let followRed = Matrix.multAll([
       Matrix.scale(zoom,zoom,1),
+      Matrix.rotY(rotate),
       Matrix.xlate(xlate.x, xlate.y, 0),
     ]);
+    let inv = Matrix.rotY(-rotate);
 
-    metro.render(followRed);
+    metro.render(followRed, inv);
   }, {oneFrame: false});
 }
 
