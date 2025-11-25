@@ -361,7 +361,7 @@ function start() {
 
   setTimeout(()=>{
     kickEffects.tug = false;
-  }, 120*1000);
+  }, 120*1000 - 2000); // stopping earlier to not lock it in
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
@@ -390,6 +390,7 @@ function start() {
     }
     else if (time<130) {
       rotate = ((time-120)/10)*TAU/4;
+      // exceeded Z limit, still gotta shove it back into -1~1
     }
     metro.runTrain(0.01);
 
