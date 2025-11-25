@@ -81,6 +81,10 @@ function start() {
   let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
   let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
   let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 64);
+  const GREETZ = 'stargaze\nwrighter\n0b5vr\nSession Orgas\nLow Score Boy\nFL_YANG\njrwei\nananq_0w0\nwhereischappie\npsenough\nocf.tw\nAtsushi Eno\nAmos Li'.split('\n');
+  let greetzLtn = ShowText.createText(GREETZ[0]);
+  ShowText.addToRack(greetzLtn);
+  greetzLtn.style.display = 'none';
 
   setInterval(()=>{
     if (!trainSlowing) {return;}
@@ -118,6 +122,7 @@ function start() {
     }`,
     trigger: (station)=>{
       hopTrain = metro.trains[Math.floor(Math.random()*metro.trains.length)];
+      greetzLtn.textContent = GREETZ[Math.floor(Math.random()*GREETZ.length)];
       return [
 	{type: 'float', key: 'pitch', value: Beeper.tet(17, melody(station.name, mainScale))},
 	{type: 'float', key: 'volume', value: 0.1}
@@ -562,8 +567,11 @@ function start() {
       xlate.y = -mix(hopTrain.fromSta.y, hopTrain.toSta.y, hopTrain.perc);
       lastTrainHoppedX = xlate.x;
       lastTrainHoppedY = xlate.y;
+      greetzLtn.style.display = '';
     }
     else if (time<140) {
+      greetzLtn.style.display = 'none';
+
       let perc = (time-120)/20;
       perc = Math.pow(perc, 0.2);
 
