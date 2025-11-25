@@ -363,7 +363,7 @@ function start() {
 
   setTimeout(()=>{
     kickEffects.tug = false;
-  }, 120*1000 - 2000); // stopping earlier to not lock it in
+  }, 120*1000 - 5000); // stopping earlier to not lock it in
   
   function findBannanWenhuCenter() {
     let zhongxiaoFuxing = metro.stations.find(station=>station.name===24);
