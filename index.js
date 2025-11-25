@@ -65,8 +65,10 @@ function start() {
   let trainAccelerating = false;
   let trainAcceleratPerc = 0.0;
   let hopTrain;
+  let lastTrainHoppedX, lastTrainHoppedY;
   let bannanWenhuCenter = {x: 0, y:0};
   let BLBRcircle = [];
+  let center = {x: 0, y: 0};
   let stashConnections = [];
   let stashSpeeds = [];
 
@@ -216,7 +218,7 @@ function start() {
       return vec3(x)*(1.0/float(0xffffffffU));
   }
   vec3 hash3f( vec3 x )
-  {o̍h
+  {
       return hash(uvec3(x*66456.85725));
   }
   vec2 spray( float t, float freq, float spread, float seed, float interval, int count) {
@@ -365,13 +367,30 @@ function start() {
     kickEffects.tug = false;
   }, 120*1000 - 5000); // stopping earlier to not lock it in
   
+  /*
   function findBannanWenhuCenter() {
     let zhongxiaoFuxing = metro.stations.find(station=>station.name===24);
     let nangangExhib = metro.stations.find(station=>station.name===39);
     bannanWenhuCenter.x = (zhongxiaoFuxing.x+nangangExhib.x)/2;
     bannanWenhuCenter.y = (zhongxiaoFuxing.y+nangangExhib.y)/2;
   }
+  */
   function zSculpture(time) {
+    // i know, perf, too lazy to refacter lol
+    let ySorted = metro.stations.toSorted((a,b)=>a.y-b.y);
+
+    let minY = ySorted[0].y;
+    let maxY = ySorted[ySorted.length-1].y;
+    
+    let silly = mix(1,5,(Math.cos(time*0.33)+Math.cos(time*0.52))*0.25+0.5);
+    for (let station of ySorted) {
+      let perc = (station.y-minY)/(maxY-minY);
+      station.z = Math.cos(perc*PI*silly-PI/2
+	+(Math.floor(station.x*99)%2===0?PI:0)*silly
+      );
+      station.z *= 0.25;
+    }
+    /*
     if (BLBRcircle.length===0) {
       let BLBRcircleIndices = [24, 40, 41, 42, 43, 44, 45, 46, 
 			       39, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 25, 18];
@@ -421,8 +440,19 @@ function start() {
       let station = rightHalf[i];
       let perc = getPerc(station.y);
       station.z = Math.cos(perc*PI-PI/2)*0.25;
-    }
+    }*/
   }
+  setTimeout(()=>{
+    trainSlowing = true;
+    stashSpeeds = [];
+    for (let train of metro.trains) {
+      stashSpeeds.push({train: train, speed: train.speed});
+    }
+  }, 130*1000);
+  setTimeout(()=>{
+    authorHan.style.display = '';
+    authorLtn.style.display = '';
+  }, 140*1000);
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
@@ -430,6 +460,21 @@ function start() {
     let rotate = 0;
     let zoom = 1;
     let xlate = {x: 0, y:0};
+
+    function approxCenter() {
+      let SAMPLES = 8;
+      let avg = {x:0, y:0};
+      for (let i=0; i<SAMPLES; i++) {
+	let station = metro.stations[Math.floor(Math.random()*metro.stations.length)];
+	avg.x += station.x;
+	avg.y += station.y;
+      }
+      avg.x /= SAMPLES;
+      avg.y /= SAMPLES;
+      center.x = mix(center.x, avg.x, 0.001);
+      center.y = mix(center.y, avg.y, 0.001);
+    }
+    approxCenter();
 
     metro.runTrain(0.01);
 
@@ -446,11 +491,14 @@ function start() {
     else if (trainAccelerating && 120<time) {
       trainAcceleratPerc = 0;
       trainAccelerating = false;
-      findBannanWenhuCenter();
-      zSculpture(time);
+      //findBannanWenhuCenter();
+      //zSculpture(time);
       for (let train of metro.trains) {
 	train.speed = stashSpeeds.find(record=>record.train===train).speed;
       }
+    }
+    else if (120<time) {
+      zSculpture(time);
     }
 
     if (time<120) {
@@ -481,8 +529,12 @@ function start() {
       let perc = (time-90)/30;
       zoom = mix(1, 4, Math.pow(perc,0.8));
     }
+    else if (time<140) {
+      let perc = (time-120)/20;
+      zoom = mix(4, 0.75, Math.pow(perc,0.5));
+    }
     else {
-      zoom = 1;
+      zoom = 0.75;
     }
 
     if (time<10) {
@@ -491,21 +543,32 @@ function start() {
     }
     else if (time<50) {
       let perc = (time-10)/40;
-      perc = 1-Math.pow(perc, 0.6);
-      xlate.x = -mix(trainRed1.fromSta.x, trainRed1.toSta.x, trainRed1.perc) * perc;
-      xlate.y = -mix(trainRed1.fromSta.y, trainRed1.toSta.y, trainRed1.perc) * perc;
+      perc = Math.pow(perc, 0.6);
+      xlate.x = -mix(mix(trainRed1.fromSta.x, trainRed1.toSta.x, trainRed1.perc), center.x, perc);
+      xlate.y = -mix(mix(trainRed1.fromSta.y, trainRed1.toSta.y, trainRed1.perc), center.y, perc);
     }
     else if (time<90) {
-      xlate.x = 0;
-      xlate.y = 0;
+      xlate.x = -center.x;
+      xlate.y = -center.y;
     }
     else if (time<120) {
       xlate.x = -mix(hopTrain.fromSta.x, hopTrain.toSta.x, hopTrain.perc);
       xlate.y = -mix(hopTrain.fromSta.y, hopTrain.toSta.y, hopTrain.perc);
+      lastTrainHoppedX = xlate.x;
+      lastTrainHoppedY = xlate.y;
+    }
+    else if (time<140) {
+      let perc = (time-120)/20;
+      perc = 1-Math.pow(perc, 0.5);
+
+      xlate.x = -mix(lastTrainHoppedX, center.x, perc);
+      xlate.y = -mix(lastTrainHoppedY, center.y, perc);
     }
     else {
-      xlate.x = -bannanWenhuCenter.x;
-      xlate.y = -bannanWenhuCenter.y;
+      xlate.x = -center.x;
+      xlate.y = -center.y;
+      //xlate.x = -bannanWenhuCenter.x;
+      //xlate.y = -bannanWenhuCenter.y;
     }
 
     let followRed = Matrix.multAll([
