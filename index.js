@@ -61,7 +61,11 @@ function start() {
     tugForce: 0.4,
   };
   let trainSlowing = false;
+  let trainAccelerating = false;
+  let trainAcceleratPerc = 0.0;
   let hopTrain;
+  let stashConnections = [];
+  let stashSpeeds = [];
 
   let titleHan = ShowText.createText('«到遐就知到矣»');
   let titleLtn = ShowText.createText('"Kàu hia to̍h chai kàu ah"');
@@ -76,6 +80,13 @@ function start() {
     if (!trainSlowing) {return;}
     for (let train of metro.trains) {
       train.speed *= 0.98;
+    }
+  }, 200);
+  setInterval(()=>{
+    if (!trainAccelerating) { return; }
+    for (let train of metro.trains) {
+      let ogSpeed = stashSpeeds.find(record=>record.train===train).speed;
+      train.speed = mix(ogSpeed, ogSpeed*1.5, trainAcceleratPerc);
     }
   }, 200);
   
@@ -253,8 +264,6 @@ function start() {
   addSeries([106, 94, 109, 108], YELLOW, 40*1000, 1600, true);
   addSeries([106, 105, 110, 111, 112, 113, 62, 114, 115, 116, 67], YELLOW, 41*1000, 1600);
 
-  let stashConnections = [];
-  let stashSpeeds = [];
   setTimeout(()=>{
     let cutAmount = metro.connections.length*0.5;
     for (let i=0; i<cutAmount; i++) {
@@ -265,6 +274,7 @@ function start() {
     }
 
     trainSlowing = true;
+    stashSpeeds = [];
     for (let train of metro.trains) {
       stashSpeeds.push({train: train, speed: train.speed});
     }
@@ -351,6 +361,24 @@ function start() {
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
 
+    if (100<time && time<120) {
+      if (!trainAccelerating) {
+	stashSpeeds = [];
+	for (let train of metro.trains) {
+	  stashSpeeds.push({train: train, speed: train.speed});
+	}
+      }
+      trainAccelerating = true;
+      trainAcceleratPerc = (time-100)/20;
+    }
+    else if (trainAccelerating && 120<time) {
+      trainAcceleratPerc = 0;
+      trainAccelerating = false;
+      for (let train of metro.trains) {
+	train.speed = stashSpeeds.find(record=>record.train===train).speed;
+      }
+    }
+
     // pretty good ratio {attract: .064, repulse: 0.0006, slippy: 0.8}
     metro.physics({attract: 0.01, repulse: 0.00022, slippy: 0.6});
     metro.runTrain(0.01);
@@ -372,7 +400,7 @@ function start() {
     }
     else if (time<120) {
       let perc = (time-90)/30;
-      zoom = mix(1, 4, Math.pow(perc,0.5));
+      zoom = mix(1, 4, Math.pow(perc,0.8));
     }
     else {
       zoom = 1;
