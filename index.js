@@ -80,6 +80,8 @@ function start() {
   let inviteLtn = ShowText.createText('you\'ve been invited to join-');
   let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
   let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
+  let sessionsHan = ShowText.createText('SESSIONS 2025 が楽しかったことを願っています', 72);
+  let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 64);
 
   setInterval(()=>{
     if (!trainSlowing) {return;}
@@ -382,7 +384,7 @@ function start() {
     let minY = ySorted[0].y;
     let maxY = ySorted[ySorted.length-1].y;
     
-    let silly = mix(1,5,(Math.cos(time*0.33)+Math.cos(time*0.52))*0.25+0.5);
+    let silly = mix(1,5,(Math.cos(time*0.17)+Math.cos(time*0.32))*0.25+0.5);
     for (let station of ySorted) {
       let perc = (station.y-minY)/(maxY-minY);
       station.z = Math.cos(perc*PI*silly-PI/2
@@ -453,6 +455,12 @@ function start() {
     authorHan.style.display = '';
     authorLtn.style.display = '';
   }, 140*1000);
+  setTimeout(()=>{
+    authorHan.style.display = 'none';
+    authorLtn.style.display = 'none';
+    ShowText.addToRack(sessionsHan);
+    ShowText.addToRack(sessionsLtn);
+  }, 143*1000);
 
   ciosaigl.run((time)=>{
     ciosaigl.background([0.95,0.95,0.95,1]);
@@ -531,7 +539,7 @@ function start() {
     }
     else if (time<140) {
       let perc = (time-120)/20;
-      zoom = mix(4, 0.75, Math.pow(perc,0.5));
+      zoom = mix(4, 0.75, Math.pow(perc,0.2));
     }
     else {
       zoom = 0.75;
@@ -559,7 +567,7 @@ function start() {
     }
     else if (time<140) {
       let perc = (time-120)/20;
-      perc = 1-Math.pow(perc, 0.5);
+      perc = Math.pow(perc, 0.2);
 
       xlate.x = -mix(lastTrainHoppedX, center.x, perc);
       xlate.y = -mix(lastTrainHoppedY, center.y, perc);
