@@ -80,7 +80,6 @@ function start() {
   let inviteLtn = ShowText.createText('you\'ve been invited to join-');
   let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
   let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
-  let sessionsHan = ShowText.createText('SESSIONS 2025 が楽しかったことを願っています', 72);
   let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 64);
 
   setInterval(()=>{
@@ -458,7 +457,6 @@ function start() {
   setTimeout(()=>{
     authorHan.style.display = 'none';
     authorLtn.style.display = 'none';
-    ShowText.addToRack(sessionsHan);
     ShowText.addToRack(sessionsLtn);
   }, 143*1000);
 
