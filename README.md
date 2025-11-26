@@ -6,6 +6,7 @@
 1. install dependencies
 1. for deno specifically, `deno task build`, for npm run its respective vite build command
 1. the final html (and the inlined js will be in `dist/index.html`)
+1. optionally pack it into a proper submission with this command (linux) `zip -r dist/source.zip . -x ./dist/* -x "./.vite/*"; cp index.nfo dist/index.nfo; zip -r dist/ciosai-sessions2025-realtime-kau_hia_toh_chai_kau_ah.zip dist; rm dist/index.nfo dist/source.zip`
 
 # greetz
 
