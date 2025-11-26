@@ -1,4 +1,4 @@
-# ciosai's demo for Sessions probably
+# ciosai's demo for Sessions
 
 # set up
 
