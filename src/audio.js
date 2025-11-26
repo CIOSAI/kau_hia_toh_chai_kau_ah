@@ -60,7 +60,7 @@ export class Beeper {
     return this.synths[name];
   }
 
-  static pitch (note) {
+  /*static pitch (note) {
     if (!/[ABCDEFG][b\#]?[0-9]+/.test(note)) {
       console.warn(`what format is ${note}? expected something like A#4, G6, Db2...`);
     }
@@ -72,7 +72,7 @@ export class Beeper {
       (octave-(['A', 'B'].includes(name[1])?4:5)) * 12
     );
     return centralA*Math.pow(2.0, n/12.0); 
-  }
+  }*/
 
   static tet (division, n) {
     return centralA*Math.pow(2.0, n/division);
