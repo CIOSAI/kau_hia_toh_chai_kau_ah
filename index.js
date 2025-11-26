@@ -79,8 +79,8 @@ function start() {
   let inviteHan = ShowText.createText('請汝做伙來-');
   let inviteLtn = ShowText.createText('you\'ve been invited to join-');
   let partyInfoHan = ShowText.createText('台北 / 一月 17 / 運算子數位藝術節');
-  let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 64);
-  let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 64);
+  let partyInfoLtn = ShowText.createText('Taipei / JAN 17 / Operator Digitalfest', 6);
+  let sessionsLtn = ShowText.createText('Hope you had a fun SESSIONS 2025', 6);
   const GREETZ = 'stargaze,wrighter,0b5vr,Session Orgas,Low Score Boy,FL_YANG,jrwei,ananq_0w0,whereischappie,psenough,ocf.tw,g0v.tw,Atsushi Eno,Amos Li'.split(',');
   let greetzLtn = ShowText.createText(GREETZ[0]);
   ShowText.addToRack(greetzLtn);
