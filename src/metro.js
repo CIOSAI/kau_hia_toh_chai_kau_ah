@@ -193,22 +193,28 @@ export class Metro {
   }
 
   render (globTrans=Trans.identity, globInvert=Trans.identity) {
+    let minimizerJam = 0; // this doesnt affect the logic, just tricks minimizer into keeping them as two different loops
     for (let c of this.connections) {
       let shape = this.shapeMaker.capsule({a: c.nodes[0].toVec4(), b: c.nodes[1].toVec4(), radius: 0.005});
-      if (!this.shapes.hasOwnProperty('capsule')) {
-	this.shapes['capsule'] = this.ciosaigl.initShape(shape);
+      let name = `capsule:${c.nodes[0].name}:${c.nodes[1].name}`;
+      if (!this.shapes.hasOwnProperty(name)) {
+	this.shapes[name] = this.ciosaigl.initShape(shape);
       }
       else {
-	this.ciosaigl.modifyShape(this.shapes['capsule'], shape);
+	this.ciosaigl.modifyShape(this.shapes[name], shape);
       }
+      minimizerJam += c.nodes[0].name*0;
+    }
+    for (let c of this.connections) {
+      let name = `capsule:${c.nodes[0].name}:${c.nodes[1].name}`;
 
       this.ciosaigl.xform(Trans.multAll([
         Trans.scale(9/16,1,1),
 	globTrans,
-        Trans.scale(1, 1, 1),
+        Trans.scale(1, 1, 1+minimizerJam),
       ]));
       this.ciosaigl.color(c.color);
-      this.ciosaigl.drawShape(this.shapes['capsule']);
+      this.ciosaigl.drawShape(this.shapes[name]);
     }
 
     if (!this.shapes.hasOwnProperty('circle')) {
