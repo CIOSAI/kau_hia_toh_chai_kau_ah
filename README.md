@@ -9,7 +9,7 @@
 
 # greetz
 
-stargaze, wrighter, 0b5vr, Session Orgas, Low Score Boy, FL\_YANG, jrwei, ananq\_0w0, whereischappie, psenough, ocf.tw, g0v.tw, Atsushi Eno, Amos Li
+stargaze, wrighter, 0b5vr, Session Orgas, Low Score Boy, FL\_YANG, jrwei, ananq\_0w0, whereischappie, psenough, ocf.tw, g0v.tw, Atsushi Eno, Amos Li, jon, echo heo
 
 # credit
 
