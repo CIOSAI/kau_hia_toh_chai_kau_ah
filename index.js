@@ -13,7 +13,12 @@ let gl = canvas.getContext('webgl2', { premultipliedAlpha: false });
 let ciosaigl = new CiosaiGL(gl);
 let metro = new Metro(ciosaigl, new Beeper(ciosaigl));
 
+let fileOpenedMoment = Date.now();
+let demoStartedMoment = fileOpenedMoment;
+
 function start() {
+  demoStartedMoment = Date.now()-fileOpenedMoment;
+
   startButton.style.display = 'none';
   document.body.requestFullscreen();
 
@@ -466,6 +471,9 @@ function start() {
   }, 143*1000);
 
   ciosaigl.run((time)=>{
+    let demoTime = time-demoStartedMoment/1000;
+    console.log(demoTime);
+
     ciosaigl.background([0.95,0.95,0.95,1]);
 
     let rotate = 0;
@@ -489,7 +497,7 @@ function start() {
 
     metro.runTrain(0.01);
 
-    if (100<time && time<120) {
+    if (100<demoTime && demoTime<120) {
       if (!trainAccelerating) {
 	stashSpeeds = [];
 	for (let train of metro.trains) {
@@ -497,82 +505,82 @@ function start() {
 	}
       }
       trainAccelerating = true;
-      trainAcceleratPerc = (time-100)/20;
+      trainAcceleratPerc = (demoTime-100)/20;
     }
-    else if (trainAccelerating && 120<time) {
+    else if (trainAccelerating && 120<demoTime) {
       trainAcceleratPerc = 0;
       trainAccelerating = false;
       //findBannanWenhuCenter();
-      //zSculpture(time);
+      //zSculpture(demoTime);
       for (let train of metro.trains) {
 	train.speed = stashSpeeds.find(record=>record.train===train).speed;
       }
     }
-    else if (120<time) {
-      zSculpture(time);
+    else if (120<demoTime) {
+      zSculpture(demoTime);
     }
 
-    if (time<120) {
+    if (demoTime<120) {
       metro.physics({attract: 0.01, repulse: 0.00022, slippy: 0.6});
     }
-    else if (time<140) {
-      rotate = ((time-120)/20)*TAU/4;
+    else if (demoTime<140) {
+      rotate = ((demoTime-120)/20)*TAU/4;
     }
     else {
       rotate = TAU/4;
     }
 
-    if (time<10) {
+    if (demoTime<10) {
       zoom = 5;
     }
-    else if (time<30) {
-      let perc = (time-10)/20;
+    else if (demoTime<30) {
+      let perc = (demoTime-10)/20;
       zoom = mix(5, 0.75, Math.pow(perc,0.3));
     }
-    else if (time<80) {
+    else if (demoTime<80) {
       zoom = 0.75;
     }
-    else if (time<90) {
-      let perc = (time-80)/10;
+    else if (demoTime<90) {
+      let perc = (demoTime-80)/10;
       zoom = mix(0.75, 1, Math.pow(perc,0.3));
     }
-    else if (time<120) {
-      let perc = (time-90)/30;
+    else if (demoTime<120) {
+      let perc = (demoTime-90)/30;
       zoom = mix(1, 4, Math.pow(perc,0.8));
     }
-    else if (time<140) {
-      let perc = (time-120)/20;
+    else if (demoTime<140) {
+      let perc = (demoTime-120)/20;
       zoom = mix(4, 0.75, Math.pow(perc,0.2));
     }
     else {
       zoom = 0.75;
     }
 
-    if (time<10) {
+    if (demoTime<10) {
       xlate.x = -mix(trainRed1.fromSta.x, trainRed1.toSta.x, trainRed1.perc);
       xlate.y = -mix(trainRed1.fromSta.y, trainRed1.toSta.y, trainRed1.perc);
     }
-    else if (time<50) {
-      let perc = (time-10)/40;
+    else if (demoTime<50) {
+      let perc = (demoTime-10)/40;
       perc = Math.pow(perc, 0.6);
       xlate.x = -mix(mix(trainRed1.fromSta.x, trainRed1.toSta.x, trainRed1.perc), center.x, perc);
       xlate.y = -mix(mix(trainRed1.fromSta.y, trainRed1.toSta.y, trainRed1.perc), center.y, perc);
     }
-    else if (time<90) {
+    else if (demoTime<90) {
       xlate.x = -center.x;
       xlate.y = -center.y;
     }
-    else if (time<120) {
+    else if (demoTime<120) {
       xlate.x = -mix(hopTrain.fromSta.x, hopTrain.toSta.x, hopTrain.perc);
       xlate.y = -mix(hopTrain.fromSta.y, hopTrain.toSta.y, hopTrain.perc);
       lastTrainHoppedX = xlate.x;
       lastTrainHoppedY = xlate.y;
       greetzLtn.style.display = '';
     }
-    else if (time<140) {
+    else if (demoTime<140) {
       greetzLtn.style.display = 'none';
 
-      let perc = (time-120)/20;
+      let perc = (demoTime-120)/20;
       perc = Math.pow(perc, 0.2);
 
       xlate.x = -mix(lastTrainHoppedX, center.x, perc);
