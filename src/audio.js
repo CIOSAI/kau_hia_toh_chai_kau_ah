@@ -8,9 +8,7 @@ export class Beeper {
     this.ctx = new AudioContext();
 
     this.bufferDuration = 0.5; // in seconds
-    this.buffer = new AudioBuffer(
-      {numberOfChannels: 2, length: this.bufferDuration*this.ctx.sampleRate, sampleRate: this.ctx.sampleRate}
-    );
+    this.buffers = [];
     this.fb = this.ciosaigl.initFb({width: this.bufferDuration*this.ctx.sampleRate/4, height: 2, 
                                     format: this.ciosaigl.gl.RGBA32F});
     this.quadShaderV = `
@@ -42,6 +40,16 @@ export class Beeper {
 	FragColor = c;
       }`;
     this.synths = {};
+
+    this.audioCache = {};
+  }
+
+  createEmptyBuffer() {
+    let buffer = new AudioBuffer(
+      {numberOfChannels: 2, length: this.bufferDuration*this.ctx.sampleRate, sampleRate: this.ctx.sampleRate}
+    );
+    this.buffers.push(buffer);
+    return buffer;
   }
 
   initSynth (name, fragment) {
@@ -71,21 +79,33 @@ export class Beeper {
   }
 
   play (synth, params=[]) {
-    if (this.ctx.state==='running') {
-      this.ciosaigl.setUniform(synth.shader, [{type: 'float', key: 'sampleRate', value: this.ctx.sampleRate}, ...params]);
-
-      this.ciosaigl.useFb(this.fb);
-      this.ciosaigl.drawShape({loc: 0, tri: 3}, synth.shader);
-
-      this.ciosaigl.gl.readPixels(0,0,this.bufferDuration*this.ctx.sampleRate/4,1,
-				  this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,this.buffer.getChannelData(0));
-      this.ciosaigl.gl.readPixels(0,1,this.bufferDuration*this.ctx.sampleRate/4,1,
-				  this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,this.buffer.getChannelData(1));
-
-      this.ciosaigl.useFb();
+    let uniforms = params.map(obj=>`${obj.key}:${obj.value}`).join(',');
+    let soundClip;
+    if (Object.hasOwn(this.audioCache, uniforms)) {
+      soundClip = new AudioBufferSourceNode(this.ctx, {buffer: this.audioCache[uniforms]});
+      //console.log('cache read: '+uniforms);
     }
+    else {
+      let buffer = this.createEmptyBuffer();
+      if (this.ctx.state==='running') {
+	this.ciosaigl.setUniform(synth.shader, [{type: 'float', key: 'sampleRate', value: this.ctx.sampleRate}, ...params]);
 
-    let soundClip = new AudioBufferSourceNode(this.ctx, {buffer: this.buffer});
+	this.ciosaigl.useFb(this.fb);
+	this.ciosaigl.drawShape({loc: 0, tri: 3}, synth.shader);
+
+	this.ciosaigl.gl.readPixels(0,0,this.bufferDuration*this.ctx.sampleRate/4,1,
+				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,buffer.getChannelData(0));
+	this.ciosaigl.gl.readPixels(0,1,this.bufferDuration*this.ctx.sampleRate/4,1,
+				    this.ciosaigl.gl.RGBA,this.ciosaigl.gl.FLOAT,buffer.getChannelData(1));
+
+	this.ciosaigl.useFb();
+
+	this.audioCache[uniforms] = buffer;
+	//console.log('cached: '+uniforms);
+      }
+
+      soundClip = new AudioBufferSourceNode(this.ctx, {buffer: buffer});
+    }
 
     soundClip.connect(this.ctx.destination);
     soundClip.start();
