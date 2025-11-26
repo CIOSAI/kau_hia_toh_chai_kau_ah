@@ -472,7 +472,7 @@ function start() {
 
   ciosaigl.run((time)=>{
     let demoTime = time-demoStartedMoment/1000;
-    console.log(demoTime);
+    // console.log(demoTime);
 
     ciosaigl.background([0.95,0.95,0.95,1]);
 
@@ -535,18 +535,14 @@ function start() {
     }
     else if (demoTime<30) {
       let perc = (demoTime-10)/20;
-      zoom = mix(5, 0.75, Math.pow(perc,0.3));
-    }
-    else if (demoTime<80) {
-      zoom = 0.75;
+      zoom = mix(5, 0.85, Math.pow(perc,0.3));
     }
     else if (demoTime<90) {
-      let perc = (demoTime-80)/10;
-      zoom = mix(0.75, 1, Math.pow(perc,0.3));
+      zoom = 0.85;
     }
     else if (demoTime<120) {
       let perc = (demoTime-90)/30;
-      zoom = mix(1, 4, Math.pow(perc,0.8));
+      zoom = mix(0.85, 4, Math.pow(perc,0.8));
     }
     else if (demoTime<140) {
       let perc = (demoTime-120)/20;
