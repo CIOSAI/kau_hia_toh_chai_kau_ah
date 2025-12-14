@@ -14,7 +14,7 @@ For archival purpose I feel like this info is important enough, there are approx
 
 1. I used Math.random(), in a LOT of places, generally the exact location of the nodes will be different every playback
 1. Local fonts: I obviously didn't pack a whole font in there, I used your local fonts, whatever sans-serif you happen to have will determine your result. Notably Chinese characters and combining vertical line above(a Peh-oe-ji diacritic) might not show up / display in the same font / positioned correctly / all of the above. Tanoshii, ne?
-1. Performance: I did NOT use delta time, only capped FPS, sigh, don't mentioned it ~n~ This means every playback will be slightly different rhythm, and more noticeable the slower it runs for you, sumimasen lol
+1. Performance: I did NOT use delta time, only capped FPS, sigh, don't mentioned it \~n\~ This means every playback will be slightly different rhythm, and more noticeable the slower it runs for you, sumimasen lol
 
 # greetz
 
